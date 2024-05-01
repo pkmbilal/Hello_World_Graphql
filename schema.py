@@ -1,22 +1,29 @@
 import strawberry
-from fastapi import FastAPI
-from strawberry.fastapi import GraphQLRouter
+import typing
 
 
-def greet():
-    return 'Hello World!'
+user_data = [
+    {"id": 1, "name": "Mohammed Bilal", "email": "bilal00717@gmail.com", "phone": "0543831060"},
+    {"id": 2, "name": "Ameen", "email": "ameen@gmail.com", "phone": "0544837257"},
+]
+
+
+@strawberry.type
+class User:
+    id: int
+    name: str
+    email: str
+    phone: str
+
+
+def get_users():
+    users = [User(**data) for data in user_data]
+    return users
 
 
 @strawberry.type
 class Query:
-    hello: str = strawberry.field(resolver=greet)
+    users: typing.List[User] = strawberry.field(resolver=get_users)
 
 
 schema = strawberry.Schema(query=Query)
-
-
-graphql_app = GraphQLRouter(schema)
-
-
-app = FastAPI()
-app.include_router(graphql_app, prefix="/graphql")
